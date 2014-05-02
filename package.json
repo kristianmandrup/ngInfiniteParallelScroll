@@ -25,6 +25,7 @@
   "readmeFilename": "README.md",
   "devDependencies": {
     "chai": "~1.4.0",
+    "browserify": ">3.0.0",
     "grunt-testacular": "~0.3.0",
     "grunt-coffeelint": "0.0.5",
     "grunt-coffee": "0.0.6",

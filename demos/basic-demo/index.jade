@@ -1,0 +1,20 @@
+doctype html
+html(lang="en")
+  head
+    meta(charset='utf8')
+    title Basic demo - ngInfiniteScroller
+    link(rel='stylesheet', href='app.css')
+    link(rel='stylesheet', href='../app/bower_components/bootstrap-sass/dist/css/bootstrap.min.css')
+  body
+    h1 Basic demo - ngInfiniteScroller
+    #container.col
+
+      #demo-wrapper.row(ng-app='myApp' ng-controller='DemoController')
+        #scroll-container(infinite-scroll='loadMore()' infinite-scroll-distance='2')
+          img.col-sm-6.col-lg-3.item(ng-repeat='image in images' ng-src='http://placehold.it/225x250&text={{image}}')
+
+  script(src='../app/bower_components/jquery/dist/jquery.min.js')
+  script(src='../app/bower_components/angular/angular.min.js')
+  script(src='../../build/infinite-scroller.js')
+
+  script(src='app.js')

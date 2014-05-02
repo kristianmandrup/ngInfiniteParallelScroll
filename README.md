@@ -4,27 +4,12 @@
 
 ngInfiniteScroll is a directive for [AngularJS](http://angularjs.org/) to evaluate an expression when the bottom of the directive's element approaches the bottom of the browser window, which can be used to implement infinite scrolling.
 
-Demos
------
-
-Check out the running demos [at the ngInfiniteScroll web site](http://sroze.github.com/ngInfiniteScroll/demos.html).
-
-Version Numbers
----------------
-
-ngInfinite Scroll follows [semantic versioning](http://semver.org/) and uses the following versioning scheme:
-
- * Versions starting with 0 (e.g. 0.1.0, 0.2.0, etc.) are for initial development, and the API is not stable
- * Versions with an even minor version (1.0.0, 1.4.0, 2.2.0, etc.) are stable releases
- * Versions with an odd minor version (1.1.0, 1.3.0, 2.1.0, etc.) are development releases
-
-The [download page](http://sroze.github.com/ngInfiniteScroll/#download) allows you to pick among various versions and specify which releases are stable (not including pre-release builds).
-
 Getting Started
 ---------------
 
- * Download ngInfiniteScroll from [the download page on the ngInfiniteScroll web site](http://sroze.github.com/ngInfiniteScroll/#download) or install it with [Bower](http://bower.io/) via `bower install ngInfiniteScroll`
- * Include the script tag on your page after the AngularJS and jQuery script tags (ngInfiniteScroll requires jQuery to run)
+ * See ngInfiniteScroll @ [ngInfiniteScroll web site](http://sroze.github.com/ngInfiniteScroll/)
+ * Install via Bower: `bower install ngInfiniteScroll`
+ * Include the script tag on your page after the AngularJS and jQuery script tags
 
         <script type='text/javascript' src='path/to/jquery.min.js'></script>
         <script type='text/javascript' src='path/to/angular.min.js'></script>
@@ -58,7 +43,26 @@ ngInfiniteScroll is licensed under the MIT license. See the LICENSE file for mor
 Testing
 -------
 
-ngInfiniteScroll uses Testacular for its unit tests. Note that you will need [PhantomJS](http://phantomjs.org/) on your path, and the `grunt-cli` npm package installed globally if you wish to use grunt (`npm install -g grunt-cli`). Then, install the dependencies with `npm install`.
+ngInfiniteScroll uses Testacular for its unit tests. Note that you will need [PhantomJS](http://phantomjs.org/) on your path,
+and the `grunt-cli` npm package installed globally if you wish to use grunt (`npm install -g grunt-cli`).
+Then, install the dependencies with `npm install`.
 
  * `grunt test` - continually watch for changes and run tests in PhantomJS and Chrome
  * `npm test` - run tests once in PhantomJS only
+
+Refactored version
+------------------
+
+This version is a refactored version of the *1.1.0* release by @sroze. It is a fork from [@fkiller](https://github.com/fkiller/ngInfiniteParallelScroll)
+
+Browserify
+----------
+
+This refactoring uses node Common JS modules. It can be assembled into a single file for browser usage, using browserify.
+
+`browserify src/infinite-scroller.js -o build/infinite-scroller.js`
+
+Demos
+-----
+
+This project contains a demos folder with demo projects.
