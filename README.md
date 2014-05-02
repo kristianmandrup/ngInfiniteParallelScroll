@@ -159,6 +159,18 @@ Then, install the dependencies with `npm install`.
  * `grunt test` - continually watch for changes and run tests in PhantomJS and Chrome
  * `npm test` - run tests once in PhantomJS only
 
+Test/Debug workflow
+-------------------
+
+0. Setup a LiveScript watcher `lsc -wco src src` or perhaps `lsc -wco lib src` to output `.js` files to a `lib` folder
+1. Do same hacking on the `src` files using *LiveScript* (very similar to *CoffeeScript*)
+2. Run `browserify` to generate a single file for the source (see above)
+3. Open `demos/basic-demo/index.html`in a browser
+4. Open the console in your "browser inspector" and see what goes on to debug your changes/fixes.
+5. GOTO 1
+
+Also please add more tests to the test suite ;)
+
 License
 -------
 
