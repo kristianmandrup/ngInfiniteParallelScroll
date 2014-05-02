@@ -21,14 +21,10 @@ class BaseContainerConfig implements Debugger
     @elem.height!
 
   configure: ->
-    @configure-for-chrome! if @is-chrome-browser! and @browser-version >= 34
+    # no config
 
   is-chrome-browser: ->
     @browser-name! is 'Chrome'
-
-  configure-for-chrome: ->
-    @c-height = ->
-      @container.innerHeight!
 
   browser-name: ->
     navigator-helper.sayswho.match(/\w+/)[0]
@@ -46,6 +42,17 @@ class WindowContainerConfig extends BaseContainerConfig
 
   calc-elem-bottom: ->
     @elem.offset!top + @e-height!
+
+  # per-browser configuration for determining window height correctly
+
+  configure: ->
+    @configure-for-chrome! if @is-chrome-browser! and @browser-version >= 34 # also for lower version?
+
+  # overwrite c-height function to use innerHeight of container (which is window)
+  configure-for-chrome: ->
+    @c-height = ->
+      @container.innerHeight!
+
 
 class DomContainerConfig extends BaseContainerConfig
   (debug) ->

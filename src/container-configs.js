@@ -25,18 +25,9 @@
     prototype.eHeight = function(){
       return this.elem.height();
     };
-    prototype.configure = function(){
-      if (this.isChromeBrowser() && this.browserVersion >= 34) {
-        return this.configureForChrome();
-      }
-    };
+    prototype.configure = function(){};
     prototype.isChromeBrowser = function(){
       return this.browserName() === 'Chrome';
-    };
-    prototype.configureForChrome = function(){
-      return this.cHeight = function(){
-        return this.container.innerHeight();
-      };
     };
     prototype.browserName = function(){
       return navigatorHelper.sayswho.match(/\w+/)[0];
@@ -56,6 +47,16 @@
     };
     prototype.calcElemBottom = function(){
       return this.elem.offset().top + this.eHeight();
+    };
+    prototype.configure = function(){
+      if (this.isChromeBrowser() && this.browserVersion >= 34) {
+        return this.configureForChrome();
+      }
+    };
+    prototype.configureForChrome = function(){
+      return this.cHeight = function(){
+        return this.container.innerHeight();
+      };
     };
     return WindowContainerConfig;
   }(BaseContainerConfig));

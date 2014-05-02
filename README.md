@@ -30,26 +30,6 @@ Detailed Documentation
 
 ngInfiniteScroll accepts several attributes to customize the behavior of the directive; detailed instructions can be found [on the ngInfiniteScroll web site](http://sroze.github.com/ngInfiniteScroll/documentation.html).
 
-Ports
------
-
-If you use [AngularDart](https://github.com/angular/angular.dart), Juha Komulainen has [a port of the project](http://pub.dartlang.org/packages/ng_infinite_scroll) you can use.
-
-License
--------
-
-ngInfiniteScroll is licensed under the MIT license. See the LICENSE file for more details.
-
-Testing
--------
-
-ngInfiniteScroll uses Testacular for its unit tests. Note that you will need [PhantomJS](http://phantomjs.org/) on your path,
-and the `grunt-cli` npm package installed globally if you wish to use grunt (`npm install -g grunt-cli`).
-Then, install the dependencies with `npm install`.
-
- * `grunt test` - continually watch for changes and run tests in PhantomJS and Chrome
- * `npm test` - run tests once in PhantomJS only
-
 Refactored version
 ------------------
 
@@ -81,7 +61,7 @@ This architecture should make it easy to override any of the core logic used at 
 
 Example: (change container/element height calculation to use innerHeight)
 
-```
+```javascript
 _.extend(containerConfigs.WindowContainerConfig, {
   calcContainerBottom: function() {
     this.container.innerHeight() + this.container.scrollTop();
@@ -95,7 +75,7 @@ _.extend(containerConfigs.WindowContainerConfig, {
 
 or to achieve the same at even lower granularity:
 
-```
+```javascript
 _.extend(container-configs.WindowContainerConfig, {
   c-height: function() {
     this.container.innerHeight();
@@ -106,6 +86,41 @@ _.extend(container-configs.WindowContainerConfig, {
   }
 }
 ```
+
+I also added the ability to easily make per-browser configuration for how to calculate the heights used to determine scrolling.
+Simply configure the `BaseContainerConfig` class with your own custom logic. Here is the current "Chrome 34" customization,
+using `innerHeight` instead of `height`, as per https://github.com/sroze/ngInfiniteScroll/issues/64#issue-31050771
+
+```LiveScript
+class BaseContainerConfig implements Debugger
+  (debug) ->
+    @log!
+    @configure!
+
+  configure: ->
+    # custom config here
+
+  is-chrome-browser: ->
+    @browser-name! is 'Chrome'
+
+  browser-name: ->
+  browser-version: ->
+```
+
+```LiveScript
+class WindowContainerConfig extends BaseContainerConfig
+  # ...
+  # per-browser configuration for determining window height correctly
+
+  configure: ->
+    @configure-for-chrome! if @is-chrome-browser! and @browser-version >= 34 # also for lower version?
+
+  # overwrite c-height function to use innerHeight of container (which is window)
+  configure-for-chrome: ->
+    @c-height = ->
+      @container.innerHeight!
+```
+
 
 See the code to see the full range of fine-grained hooks to override and customize as you see fit.
 
@@ -119,12 +134,32 @@ On the DOM element for the scroll container simply add a `debug-lv=x` or `debug-
 Jade (HTML) examples:
 
 ```jade
-#scroll-container(infinite-scroll='loadMore()' infinite-scroll-distance='2' debug-on='true')
+#scroller(infinite-scroll='loadMore()' debug-on='true')
 ```
 
 ```jade
-#scroll-container(infinite-scroll='loadMore()' infinite-scroll-distance='2' debug-lv='1')
+#scroller(infinite-scroll='loadMore()' debug-lv='1')
 ```
 
 This should enable debugging at all levels. Setting the `debug-lv` to a value higher than 1 will also enable logging of info
 messages at an even more granular level.
+
+Ports
+-----
+
+If you use [AngularDart](https://github.com/angular/angular.dart), Juha Komulainen has [a port of the project](http://pub.dartlang.org/packages/ng_infinite_scroll) you can use.
+
+Testing
+-------
+
+ngInfiniteScroll uses Testacular for its unit tests. Note that you will need [PhantomJS](http://phantomjs.org/) on your path,
+and the `grunt-cli` npm package installed globally if you wish to use grunt (`npm install -g grunt-cli`).
+Then, install the dependencies with `npm install`.
+
+ * `grunt test` - continually watch for changes and run tests in PhantomJS and Chrome
+ * `npm test` - run tests once in PhantomJS only
+
+License
+-------
+
+ngInfiniteScroll is licensed under the MIT license. See the LICENSE file for more details.
