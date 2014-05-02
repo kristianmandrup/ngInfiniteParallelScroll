@@ -1,6 +1,6 @@
-mod = angular.module('infinite-scroll', [])
+mod = angular.module 'infinite-scroll', []
 
-mod.value('THROTTLE_MILLISECONDS', null)
+mod.value 'THROTTLE_MILLISECONDS', null
 
 Throttler     = require './throttler'
 ScrollHandler = require './scroll-handler'

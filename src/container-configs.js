@@ -6,7 +6,8 @@
     BaseContainerConfig.displayName = 'BaseContainerConfig';
     var prototype = BaseContainerConfig.prototype, constructor = BaseContainerConfig;
     importAll$(prototype, arguments[0]);
-    function BaseContainerConfig(debug){
+    function BaseContainerConfig(scrollConfig){
+      this.scrollConfig = scrollConfig;
       this.log();
       this.configure();
     }
@@ -19,13 +20,19 @@
     prototype.elemBottom = function(){
       return this._elementBottom = calcElemBottom();
     };
+    prototype.scrollBoundary = function(){
+      return this.cHeight() * this.config.scrollDistance + 1;
+    };
     prototype.cHeight = function(){
       return this.container.height();
     };
     prototype.eHeight = function(){
       return this.elem.height();
     };
-    prototype.configure = function(){};
+    prototype.configure = function(){
+      var ref$;
+      return ref$ = this.scrollConfig, this.config = ref$.config, this.container = ref$.container, this.elem = ref$.elem, this.debugging = ref$.debugging, ref$;
+    };
     prototype.isChromeBrowser = function(){
       return this.browserName() === 'Chrome';
     };
@@ -39,7 +46,10 @@
   }(Debugger));
   WindowContainerConfig = (function(superclass){
     var prototype = extend$((import$(WindowContainerConfig, superclass).displayName = 'WindowContainerConfig', WindowContainerConfig), superclass).prototype, constructor = WindowContainerConfig;
-    function WindowContainerConfig(debug){
+    function WindowContainerConfig(container, elem, debugging){
+      this.container = container;
+      this.elem = elem;
+      this.debugging = debugging;
       WindowContainerConfig.superclass.apply(this, arguments);
     }
     prototype.calcContainerBottom = function(){
@@ -49,9 +59,7 @@
       return this.elem.offset().top + this.eHeight();
     };
     prototype.configure = function(){
-      if (this.isChromeBrowser() && this.browserVersion >= 34) {
-        return this.configureForChrome();
-      }
+      return superclass.prototype.configure.call(this);
     };
     prototype.configureForChrome = function(){
       return this.cHeight = function(){
@@ -62,9 +70,13 @@
   }(BaseContainerConfig));
   DomContainerConfig = (function(superclass){
     var prototype = extend$((import$(DomContainerConfig, superclass).displayName = 'DomContainerConfig', DomContainerConfig), superclass).prototype, constructor = DomContainerConfig;
-    function DomContainerConfig(debug){
+    function DomContainerConfig(config){
+      this.config = config;
       DomContainerConfig.superclass.apply(this, arguments);
     }
+    prototype.configure = function(){
+      return superclass.prototype.configure.call(this);
+    };
     prototype.calcContainerBottom = function(){
       return this.cHeight();
     };

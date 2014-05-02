@@ -55,7 +55,7 @@
       return this.remaining() <= this.scrollBoundary();
     };
     prototype.scrollBoundary = function(){
-      return this.container.height() * this.scrollDistance + 1;
+      return this.containerConfig().scrollBoundary();
     };
     prototype.remaining = function(){
       return this._remaining || (this._remaining = this.elementBottom() - this.containerBottom());
@@ -70,11 +70,19 @@
       return this._containerConfig || (this._containerConfig = this.windowContainerConfig() || this.domContainerConfig());
     };
     prototype.domContainerConfig = function(){
-      return new containerConfigs.ContainerConfig(this.debugging);
+      return new containerConfigs.ContainerConfig(this.scrollConfigObj());
+    };
+    prototype.scrollConfigObj = function(){
+      return {
+        config: this.config,
+        container: this.container,
+        elem: this.elem,
+        debug: this.debugging
+      };
     };
     prototype.windowContainerConfig = function(){
       if (this.isWindowContainer()) {
-        return this._windowContainerConfig || (this._windowContainerConfig = new containerConfigs.WindowContainerConfig(this.debugging));
+        return this._windowContainerConfig || (this._windowContainerConfig = new containerConfigs.WindowContainerConfig(this.scrollConfigObj()));
       }
     };
     return ScrollHandler;

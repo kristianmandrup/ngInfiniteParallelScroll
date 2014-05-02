@@ -1,7 +1,7 @@
 navigator-helper = require './navigator'
 
 class BaseContainerConfig implements Debugger
-  (debug) ->
+  (@scroll-config) ->
     @log!
     @configure!
 
@@ -14,6 +14,9 @@ class BaseContainerConfig implements Debugger
   elem-bottom: ->
     @_element-bottom   = calc-elem-bottom!
 
+  scroll-boundary: ->
+    @c-height! * @config.scroll-distance + 1
+
   c-height: ->
     @container.height!
 
@@ -21,6 +24,8 @@ class BaseContainerConfig implements Debugger
     @elem.height!
 
   configure: ->
+    # smart destructuring :)
+    @{config, container, elem, debugging} = @scroll-config
     # no config
 
   is-chrome-browser: ->
@@ -34,7 +39,7 @@ class BaseContainerConfig implements Debugger
 
 
 class WindowContainerConfig extends BaseContainerConfig
-  (debug) ->
+  (@container, @elem, @debugging) ->
     super ...
 
   calc-container-bottom: ->
@@ -46,7 +51,9 @@ class WindowContainerConfig extends BaseContainerConfig
   # per-browser configuration for determining window height correctly
 
   configure: ->
-    @configure-for-chrome! if @is-chrome-browser! and @browser-version >= 34 # also for lower version?
+    super!
+    # not needed? http://viralpatel.net/blogs/jquery-window-height-incorrect/
+    # @configure-for-chrome! if @is-chrome-browser! and @browser-version >= 34 # also for lower version?
 
   # overwrite c-height function to use innerHeight of container (which is window)
   configure-for-chrome: ->
@@ -55,9 +62,12 @@ class WindowContainerConfig extends BaseContainerConfig
 
 
 class DomContainerConfig extends BaseContainerConfig
-  (debug) ->
+  (@config) ->
     super ...
-           
+
+  configure: ->
+    super!
+
   calc-container-bottom: ->
     @c-height!
 

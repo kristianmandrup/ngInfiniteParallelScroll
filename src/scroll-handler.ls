@@ -43,30 +43,32 @@ class ScrollHandler implements Debugger
   configure-scroll: ->
     info-msg "configure-scroll, window-container:", @is-window-container!
 
-
   should-scroll: ->
     @remaining! <= @scroll-boundary!
 
   scroll-boundary: ->
-    @container.height! * @scroll-distance + 1
+    @container-config!scroll-boundary!
 
   remaining: ->
     @_remaining ||= @element-bottom! - @container-bottom!
 
   element-bottom: ->
-    @container-config!.element-bottom!
+    @container-config!element-bottom!
 
   container-bottom: ->
-    @container-config!.container-bottom!
+    @container-config!container-bottom!
 
   container-config: ->
     @_container-config ||= @window-container-config! or @dom-container-config!
 
   dom-container-config: ->
-     new container-configs.ContainerConfig @debugging
+     new container-configs.ContainerConfig @scroll-config-obj!
+
+  scroll-config-obj: ->
+    {config: @config, container: @container, elem: @elem, debug: @debugging}
 
   window-container-config: ->
-    @_window-container-config ||= new container-configs.WindowContainerConfig(@debugging) if @is-window-container!
+    @_window-container-config ||= new container-configs.WindowContainerConfig(@scroll-config-obj!) if @is-window-container!
 
 
 module.exports = ScrollHandler
