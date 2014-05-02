@@ -9,16 +9,16 @@ mod.directive 'infiniteScroller', ['$rootScope', '$window', '$timeout', 'THROTTL
                                   ($rootScope, $window, $timeout, THROTTLE_MILLISECONDS) ->
   scope:
     infinite-scroll: '&'
+    debug-on: '&'
     infinite-scroll-container: '='
     infinite-scroll-distance: '='
     infinite-scroll-disabled: '='
 
-  config: new ScrollConfig
-  scroll-handler: ->
-    @_handler ||= new ScrollHandler.handle-scroll
+  debug-msg: ->
+    if @debug-on
+      console.log ...
 
-  throttler: ->
-    @_throttle ||= new Throttler($timeout)
+  config: new ScrollConfig
 
   handle-infinite-scroll-disabled: (value) ->
     @config-toggle-scroll-enabled value
@@ -49,28 +49,45 @@ mod.directive 'infiniteScroller', ['$rootScope', '$window', '$timeout', 'THROTTL
     @container = new-container
     @container.on 'scroll', handler
 
+  # infinite-scroll-distance specifies how close to the bottom of the page
+  # the window is allowed to be before we trigger a new scroll. The value
+  # provided is multiplied by the container height; for example, to load
+  # more when the bottom of the page is less than 3 container heights away,
+  # specify a value of 3. Defaults to 0.
+  handle-infinite-scroll-distance = (value) ->
+    @config.set-scroll-distance value
+
   wrap-angular: (element) ->
     angular.element element
 
+  scroll-handler: (debug)->
+    @_scroll-handler ||= new ScrollHandler(debug).handle-scroll
+
+  throttler: ->
+    @_throttler ||= new Throttler($timeout)
+
+  throttled-scroll-handler: (wait-ms, debug)->
+    @_scroll-handler = @throttler!.config @scroll-handler(debug), wait-ms
+
   link: (scope, elem, attrs) ->
+    debug-msg "infiniteScroller: link ", attrs
     $window   = @wrap-angular $window
 
-    @scroll-handler = @throttler!.config(@scroll-handler!, THROTTLE_MILLISECONDS) if THROTTLE_MILLISECONDS?
+    @debug-on = attrs.debug-on
+
+    wait-ms = THROTTLE_MILLISECONDS
+    debug-msg "wait ", wait-ms
 
     scope.$on '$destroy', ->
-      @config.container.off 'scroll', handler
+      @config.container.off 'scroll', @throttled-scroll-handler(wait-ms, @debug-on) if wait-ms?
 
-    # infinite-scroll-distance specifies how close to the bottom of the page
-    # the window is allowed to be before we trigger a new scroll. The value
-    # provided is multiplied by the container height; for example, to load
-    # more when the bottom of the page is less than 3 container heights away,
-    # specify a value of 3. Defaults to 0.
-    handle-infinite-scroll-distance = (value) ->
-      @config.set-scroll-distance value
+    debug-msg "infiniteScrollDistance", @handle-infinite-scroll-distance
 
-    scope.$watch 'infiniteScrollDistance', handle-infinite-scroll-distance
+    scope.$watch 'infiniteScrollDistance', @handle-infinite-scroll-distance
     # If I don't explicitly call the handler here, tests fail. Don't know why yet.
-    handle-infinite-scroll-distance scope.infinite-scroll-distance
+    @handle-infinite-scroll-distance scope.infinite-scroll-distance
+
+    debug-msg "handle-infinite-scroll-distance using", scope.infinite-scroll-distance
 
     # infinite-scroll-disabled specifies a boolean that will keep the
     # infnite scroll function from being called; this is useful for
@@ -83,25 +100,36 @@ mod.directive 'infiniteScroller', ['$rootScope', '$window', '$timeout', 'THROTTL
     # If I don't explicitly call the handler here, tests fail. Don't know why yet.
     handle-infinite-scroll-disabled scope.infinite-scroll-disabled
 
+    debug-msg "try changing container to $window"
     @change-container $window
 
     scope.$watch 'infiniteScrollContainer', handle-infinite-scroll-container
-    handle-infinite-scroll-container(scope.infinite-scroll-container or [])
+    @handle-infinite-scroll-container scope.infinite-scroll-container or []
 
     # infinite-scroll-parent establishes this element's parent as the
     # container infinitely scrolled instead of the whole window.
     if attrs.infinite-scroll-parent?
-      @change-container @wrap-angular(elem.parent!)
+      parent = elem.parent!
+      angle-parent = @wrap-angular parent
 
-    # infinte-scoll-immediate-check sets whether or not run the
+      @debug-msg "Infinite scroll parent is", angle-parent
+
+      @change-container angle-parent
+    else
+      @debug-msg "Infinite scroll parent is window"
+
+    # infinite-scoll-immediate-check sets whether or not run the
     # expression passed on infinite-scroll for the first time when the
     # directive first loads, before any actual scroll.
     if attrs.infinite-scroll-immediate-check?
+      @debug-msg "infinite-scroll-immediate-check", attrs.infinite-scroll-immediatecheck
       @config.immediate-check = scope.$eval attrs.infinite-scroll-immediatecheck
 
     self = @
     $timeout (->
+      self.debug-msg 'timeout'
       if self.immediate-check
-        self.handler!
+        self.debug-msg 'immediate check OK - run handler!'
+        self.scroll-handler.handle-scroll!
     ), 0
 ]

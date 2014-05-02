@@ -7,20 +7,21 @@
   ScrollHandler = require('./scroll-handler');
   mod.directive('infiniteScroller', [
     '$rootScope', '$window', '$timeout', 'THROTTLE_MILLISECONDS', function($rootScope, $window, $timeout, THROTTLE_MILLISECONDS){
-      return {
+      var handleInfiniteScrollDistance;
+      ({
         scope: {
           infiniteScroll: '&',
+          debugOn: '&',
           infiniteScrollContainer: '=',
           infiniteScrollDistance: '=',
           infiniteScrollDisabled: '='
         },
+        debugMsg: function(){
+          if (this.debugOn) {
+            return console.log.apply(this, arguments);
+          }
+        },
         config: new ScrollConfig,
-        scrollHandler: function(){
-          return this._handler || (this._handler = new ScrollHandler.handleScroll);
-        },
-        throttler: function(){
-          return this._throttle || (this._throttle = new Throttler($timeout));
-        },
         handleInfiniteScrollDisabled: function(value){
           this.configToggleScrollEnabled(value);
           if (this.config.isScrollEnabled()) {
@@ -44,39 +45,64 @@
           }
           this.container = newContainer;
           return this.container.on('scroll', handler);
-        },
+        }
+      });
+      handleInfiniteScrollDistance = function(value){
+        return this.config.setScrollDistance(value);
+      };
+      return {
         wrapAngular: function(element){
           return angular.element(element);
         },
+        scrollHandler: function(debug){
+          return this._scrollHandler || (this._scrollHandler = new ScrollHandler(debug).handleScroll);
+        },
+        throttler: function(){
+          return this._throttler || (this._throttler = new Throttler($timeout));
+        },
+        throttledScrollHandler: function(waitMs, debug){
+          return this._scrollHandler = this.throttler().config(this.scrollHandler(debug), waitMs);
+        },
         link: function(scope, elem, attrs){
-          var $window, handleInfiniteScrollDistance, self;
+          var $window, waitMs, parent, angleParent, self;
+          debugMsg("infiniteScroller: link ", attrs);
           $window = this.wrapAngular($window);
-          if (THROTTLE_MILLISECONDS != null) {
-            this.scrollHandler = this.throttler().config(this.scrollHandler(), THROTTLE_MILLISECONDS);
-          }
+          this.debugOn = attrs.debugOn;
+          waitMs = THROTTLE_MILLISECONDS;
+          debugMsg("wait ", waitMs);
           scope.$on('$destroy', function(){
-            return this.config.container.off('scroll', handler);
+            if (waitMs != null) {
+              return this.config.container.off('scroll', this.throttledScrollHandler(waitMs, this.debugOn));
+            }
           });
-          handleInfiniteScrollDistance = function(value){
-            return this.config.setScrollDistance(value);
-          };
-          scope.$watch('infiniteScrollDistance', handleInfiniteScrollDistance);
-          handleInfiniteScrollDistance(scope.infiniteScrollDistance);
+          debugMsg("infiniteScrollDistance", this.handleInfiniteScrollDistance);
+          scope.$watch('infiniteScrollDistance', this.handleInfiniteScrollDistance);
+          this.handleInfiniteScrollDistance(scope.infiniteScrollDistance);
+          debugMsg("handle-infinite-scroll-distance using", scope.infiniteScrollDistance);
           scope.$watch('infiniteScrollDisabled', handleInfiniteScrollDisabled);
           handleInfiniteScrollDisabled(scope.infiniteScrollDisabled);
+          debugMsg("try changing container to $window");
           this.changeContainer($window);
           scope.$watch('infiniteScrollContainer', handleInfiniteScrollContainer);
-          handleInfiniteScrollContainer(scope.infiniteScrollContainer || []);
+          this.handleInfiniteScrollContainer(scope.infiniteScrollContainer) || [];
           if (attrs.infiniteScrollParent != null) {
-            this.changeContainer(this.wrapAngular(elem.parent()));
+            parent = elem.parent();
+            angleParent = this.wrapAngular(parent);
+            this.debugMsg("Infinite scroll parent is", angleParent);
+            this.changeContainer(angleParent);
+          } else {
+            this.debugMsg("Infinite scroll parent is window");
           }
           if (attrs.infiniteScrollImmediateCheck != null) {
+            this.debugMsg("infinite-scroll-immediate-check", attrs.infiniteScrollImmediatecheck);
             this.config.immediateCheck = scope.$eval(attrs.infiniteScrollImmediatecheck);
           }
           self = this;
           return $timeout(function(){
+            self.debugMsg('timeout');
             if (self.immediateCheck) {
-              return self.handler();
+              self.debugMsg('immediate check OK - run handler!');
+              return self.scrollHandler.handleScroll();
             }
           }, 0);
         }

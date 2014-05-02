@@ -65,4 +65,19 @@ This refactoring uses node Common JS modules. It can be assembled into a single 
 Demos
 -----
 
-This project contains a demos folder with demo projects.
+This project contains a `/demos` folder with demo projects.
+Currently only a `basic-demo` but feel free to make pull requests to add more demos here.
+
+Design and Architecture
+-----------------------
+
+The current implementation of infinite-scroller uses a set of helper "classes":
+
+- ScrollConfig
+- ScrollHandler
+- Throttler
+
+
+
+
+

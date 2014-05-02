@@ -4,7 +4,9 @@
 # document. It is recommended to use infinite-scroll-disabled
 # with a boolean that is set to true when the function is
 # called in order to throttle the function call.
-class ScrollHandler
+require './debugger'
+
+class ScrollHandler implements Debugger
   (@scope, @config) ->
     @container        = @config.container
     @elem             = @config.elem

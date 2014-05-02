@@ -1,4 +1,6 @@
-class Throttler
+require './debugger'
+
+class Throttler implements Debugger
   # The optional THROTTLE_MILLISECONDS configuration value specifies
   # a minimum time that should elapse between each call to the
   # handler. N.b. the first call the handler will be run
