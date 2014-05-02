@@ -1,4 +1,4 @@
-myApp = angular.module('myApp', ['infinite-scroll'])
+myApp = angular.module 'myApp', ['infinite-scroll']
 myApp.controller 'DemoController', ($scope) ->
   $scope.images = [1, 2, 3, 4, 5, 6, 7, 8]
 
