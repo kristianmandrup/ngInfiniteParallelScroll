@@ -1,4 +1,4 @@
-require './debugger'
+Debugger = require './debugger'
 
 class Throttler implements Debugger
   # The optional THROTTLE_MILLISECONDS configuration value specifies

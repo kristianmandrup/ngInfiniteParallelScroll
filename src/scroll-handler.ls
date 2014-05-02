@@ -4,7 +4,7 @@
 # document. It is recommended to use infinite-scroll-disabled
 # with a boolean that is set to true when the function is
 # called in order to throttle the function call.
-require './debugger'
+Debugger = require './debugger'
 
 class ScrollHandler implements Debugger
   (@scope, @config, debug) ->
@@ -16,7 +16,6 @@ class ScrollHandler implements Debugger
     @debug-on! if debug?
     @debug-lv = parseInt(debug, 10) or 0
     @
-
 
   handle-scroll: ->
     info-msg "remaining", @remaining!
@@ -44,7 +43,7 @@ class ScrollHandler implements Debugger
     info-msg "configure-scroll, window-container:", @is-window-container!
     if @is-window-container! then @config-window-scroll! else @config-container-scroll!
 
-  should-scroll:
+  should-scroll: ->
     @remaining! <= @scroll-boundary!
 
   scroll-boundary: ->

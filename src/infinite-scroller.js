@@ -12,6 +12,7 @@
         scope: {
           infiniteScroll: '&',
           debugOn: '&',
+          debugLv: '&',
           infiniteScrollContainer: '=',
           infiniteScrollDistance: '=',
           infiniteScrollDisabled: '='

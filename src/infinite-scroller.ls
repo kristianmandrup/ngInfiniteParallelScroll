@@ -10,6 +10,7 @@ mod.directive 'infiniteScroller', ['$rootScope', '$window', '$timeout', 'THROTTL
   scope:
     infinite-scroll: '&'
     debug-on: '&'
+    debug-lv: '&'
     infinite-scroll-container: '='
     infinite-scroll-distance: '='
     infinite-scroll-disabled: '='
