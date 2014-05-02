@@ -5,6 +5,7 @@
 # with a boolean that is set to true when the function is
 # called in order to throttle the function call.
 Debugger = require './debugger'
+container-configs = require './container-configs'
 
 class ScrollHandler implements Debugger
   (@scope, @config, debug) ->
@@ -41,7 +42,7 @@ class ScrollHandler implements Debugger
 
   configure-scroll: ->
     info-msg "configure-scroll, window-container:", @is-window-container!
-    if @is-window-container! then @config-window-scroll! else @config-container-scroll!
+
 
   should-scroll: ->
     @remaining! <= @scroll-boundary!
@@ -50,17 +51,22 @@ class ScrollHandler implements Debugger
     @container.height! * @scroll-distance + 1
 
   remaining: ->
-    @_remaining ||= @element-bottom - @container-bottom
+    @_remaining ||= @element-bottom! - @container-bottom!
 
-  config-window-scroll: ->
-    info-msg "config-window-scroll"
-    @container-bottom = @container.height! + @container.scroll-top!
-    @element-bottom   = @elem.offset!top + @elem.height!
+  element-bottom: ->
+    @container-config!.element-bottom!
 
-  config-container-scroll: ->
-    info-msg "config-container-scroll"
-    container-bottom  = @container.height!
-    element-bottom    = @elem.offset!top - @container.offset!top + @elem.height!
+  container-bottom: ->
+    @container-config!.container-bottom!
+
+  container-config: ->
+    @_container-config ||= @window-container-config! or @dom-container-config!
+
+  dom-container-config: ->
+     new container-configs.ContainerConfig @debugging
+
+  window-container-config: ->
+    @_window-container-config ||= new container-configs.WindowContainerConfig(@debugging) if @is-window-container!
 
 
 module.exports = ScrollHandler

@@ -77,7 +77,54 @@ The current implementation of infinite-scroller uses a set of helper "classes":
 - ScrollHandler
 - Throttler
 
+This architecture should make it easy to override any of the core logic used at a very fine grained level.
+
+Example: (change container/element height calculation to use innerHeight)
+
+```
+_.extend(containerConfigs.WindowContainerConfig, {
+  calcContainerBottom: function() {
+    this.container.innerHeight() + this.container.scrollTop();
+  },
+
+  calcElemBottom: function() {
+    this.elem.offset().top + this.elem.innerHeight()
+  }
+}
+```
+
+or to achieve the same at even lower granularity:
+
+```
+_.extend(container-configs.WindowContainerConfig, {
+  c-height: function() {
+    this.container.innerHeight();
+  },
+
+  e-height: function() {
+    @elem.innerHeight()
+  }
+}
+```
+
+See the code to see the full range of fine-grained hooks to override and customize as you see fit.
 
 
+Debugging
+---------
 
+The current design tries to make it easy to debug your scrolling as it is otherwise difficult to customize it correctly for your needs.
+On the DOM element for the scroll container simply add a `debug-lv=x` or `debug-on="true"` attribute.
 
+Jade (HTML) examples:
+
+```jade
+#scroll-container(infinite-scroll='loadMore()' infinite-scroll-distance='2' debug-on='true')
+```
+
+```jade
+#scroll-container(infinite-scroll='loadMore()' infinite-scroll-distance='2' debug-lv='1')
+```
+
+This should enable debugging at all levels. Setting the `debug-lv` to a value higher than 1 will also enable logging of info
+messages at an even more granular level.
