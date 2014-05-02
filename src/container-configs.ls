@@ -1,6 +1,9 @@
+navigator-helper = require './navigator'
+
 class BaseContainerConfig implements Debugger
   (debug) ->
     @log!
+    @configure!
 
   log: ->
     debug "container configuration"
@@ -16,6 +19,22 @@ class BaseContainerConfig implements Debugger
 
   e-height: ->
     @elem.height!
+
+  configure: ->
+    @configure-for-chrome! if @is-chrome-browser! and @browser-version >= 34
+
+  is-chrome-browser: ->
+    @browser-name! is 'Chrome'
+
+  configure-for-chrome: ->
+    @c-height = ->
+      @container.innerHeight!
+
+  browser-name: ->
+    navigator-helper.sayswho.match(/\w+/)[0]
+
+  browser-version: ->
+    parseInt(navigator-helper.sayswho.match(/\d+/)[0], 10)
 
 
 class WindowContainerConfig extends BaseContainerConfig
