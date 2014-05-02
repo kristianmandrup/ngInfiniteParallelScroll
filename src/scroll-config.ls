@@ -1,6 +1,8 @@
 class ScrollConfig
-  ->
+  (debug) ->
     @reset!
+    @debug-on! if debug?
+    @debug-lv = parseInt(debug, 10) or 0
 
   reset: ->
     @scroll-distance = null

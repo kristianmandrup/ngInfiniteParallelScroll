@@ -28,9 +28,11 @@
       return this.remaining || (this.remaining = wait - (this.now() - this.previous));
     };
     prototype.setTimeout = function(){
+      debug("set timeout");
       return this.timeout || (this.timeout = $timeout(later, remaining));
     };
     prototype.reset = function(){
+      debug("reset");
       this.clearTimeout(this.timeout);
       this.$timeout.cancel(this.timeout);
       this.timeout = null;
@@ -43,6 +45,7 @@
     prototype.timeout = null;
     prototype.previous = 0;
     prototype.later = function(){
+      debug("later");
       this.previous = new Date().getTime();
       this.$timeout.cancel(timeout);
       this.timeout = null;

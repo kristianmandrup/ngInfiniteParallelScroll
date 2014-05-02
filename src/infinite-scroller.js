@@ -54,26 +54,31 @@
         wrapAngular: function(element){
           return angular.element(element);
         },
-        scrollHandler: function(debug){
-          return this._scrollHandler || (this._scrollHandler = new ScrollHandler(debug).handleScroll);
+        throttler: function(debug){
+          return this._throttler || (this._throttler = new Throttler($timeout, debug));
         },
-        throttler: function(){
-          return this._throttler || (this._throttler = new Throttler($timeout));
+        basicScrollHandler: function(debug){
+          return new ScrollHandler(debug).handleScroll;
         },
         throttledScrollHandler: function(waitMs, debug){
-          return this._scrollHandler = this.throttler().config(this.scrollHandler(debug), waitMs);
+          if (waitMs != null) {
+            return this.throttler(debug).config(this.scrollHandler(debug), waitMs);
+          }
+        },
+        createScrollHandler: function(wait, debug){
+          return this.scrollHandler = this.throttledScrollHandler(wait, debug) || this.basicHandler(debug);
         },
         link: function(scope, elem, attrs){
           var $window, waitMs, parent, angleParent, self;
           debugMsg("infiniteScroller: link ", attrs);
           $window = this.wrapAngular($window);
           this.debugOn = attrs.debugOn;
+          this.debugLv = attrs.debugLv || 0;
           waitMs = THROTTLE_MILLISECONDS;
           debugMsg("wait ", waitMs);
+          this.createScrollHandler(waitMs, this.debugLv);
           scope.$on('$destroy', function(){
-            if (waitMs != null) {
-              return this.config.container.off('scroll', this.throttledScrollHandler(waitMs, this.debugOn));
-            }
+            return this.config.container.off('scroll', this.scrollHandler);
           });
           debugMsg("infiniteScrollDistance", this.handleInfiniteScrollDistance);
           scope.$watch('infiniteScrollDistance', this.handleInfiniteScrollDistance);

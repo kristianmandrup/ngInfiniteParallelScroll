@@ -4,8 +4,12 @@
   ScrollConfig = (function(){
     ScrollConfig.displayName = 'ScrollConfig';
     var prototype = ScrollConfig.prototype, constructor = ScrollConfig;
-    function ScrollConfig(){
+    function ScrollConfig(debug){
       this.reset();
+      if (debug != null) {
+        this.debugOn();
+      }
+      this.debugLv = parseInt(debug, 10) || 0;
     }
     prototype.reset = function(){
       this.scrollDistance = null;

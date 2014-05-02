@@ -6,16 +6,23 @@
     ScrollHandler.displayName = 'ScrollHandler';
     var prototype = ScrollHandler.prototype, constructor = ScrollHandler;
     importAll$(prototype, arguments[0]);
-    function ScrollHandler(scope, config){
+    function ScrollHandler(scope, config, debug){
       this.scope = scope;
       this.config = config;
       this.container = this.config.container;
       this.elem = this.config.elem;
       this.scrollDistance = this.config.scrollDistance;
       this.scrollEnabled = this.config.scrollEnabled;
+      if (debug != null) {
+        this.debugOn();
+      }
+      this.debugLv = parseInt(debug, 10) || 0;
       this;
     }
     prototype.handleScroll = function(){
+      infoMsg("remaining", this.remaining());
+      infoMsg("scroll-boundary", this.scrollBoundary());
+      debug("handle scroll, should:", this.shouldScroll());
       if (this.shouldScroll()) {
         return this.scroll();
       }
@@ -24,6 +31,7 @@
       return this.container === $window;
     };
     prototype.scroll = function(){
+      infoMsg("scroll");
       if (this.scrollEnabled) {
         return this.performScroll();
       } else {
@@ -31,13 +39,16 @@
       }
     };
     prototype.performScroll = function(){
+      infoMsg("perform scroll");
       this.configureScroll();
       return this.scope.infiniteScroll();
     };
     prototype.enableScroll = function(){
+      infoMsg("enable scroll", this.config);
       return this.config.enableScroll();
     };
     prototype.configureScroll = function(){
+      infoMsg("configure-scroll, window-container:", this.isWindowContainer());
       if (this.isWindowContainer()) {
         return this.configWindowScroll();
       } else {
@@ -52,11 +63,13 @@
       return this._remaining || (this._remaining = this.elementBottom - this.containerBottom);
     };
     prototype.configWindowScroll = function(){
+      infoMsg("config-window-scroll");
       this.containerBottom = this.container.height() + this.container.scrollTop();
       return this.elementBottom = this.elem.offset().top + this.elem.height();
     };
     prototype.configContainerScroll = function(){
       var containerBottom, elementBottom;
+      infoMsg("config-container-scroll");
       containerBottom = this.container.height();
       return elementBottom = this.elem.offset().top - this.container.offset().top + this.elem.height();
     };

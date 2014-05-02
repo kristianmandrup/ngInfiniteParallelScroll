@@ -13,8 +13,9 @@
         return console.log.apply(this, arguments);
       }
     },
+    debugLv: 0,
     infoMsg: function(){
-      if (this.debugging || constructor.debugAll) {
+      if (this.hasDebug() && this.debugLv > 0) {
         return console.log.apply(this, arguments);
       }
     },

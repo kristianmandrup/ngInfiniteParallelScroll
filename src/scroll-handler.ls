@@ -7,30 +7,41 @@
 require './debugger'
 
 class ScrollHandler implements Debugger
-  (@scope, @config) ->
+  (@scope, @config, debug) ->
     @container        = @config.container
     @elem             = @config.elem
     @scroll-distance  = @config.scroll-distance
     @scroll-enabled   = @config.scroll-enabled
+
+    @debug-on! if debug?
+    @debug-lv = parseInt(debug, 10) or 0
     @
 
+
   handle-scroll: ->
+    info-msg "remaining", @remaining!
+    info-msg "scroll-boundary", @scroll-boundary!
+    debug "handle scroll, should:", @should-scroll!
     @scroll! if @should-scroll!
 
   isWindowContainer: ->
     @container == $window
 
   scroll: ->
+    info-msg "scroll"
     if @scroll-enabled then @perform-scroll! else @enable-scroll!
 
   perform-scroll: ->
+    info-msg "perform scroll"
     @configure-scroll!
     @scope.infiniteScroll!
 
   enable-scroll: ->
+    info-msg "enable scroll", @config
     @config.enable-scroll!
 
-  configureScroll: ->
+  configure-scroll: ->
+    info-msg "configure-scroll, window-container:", @is-window-container!
     if @is-window-container! then @config-window-scroll! else @config-container-scroll!
 
   should-scroll:
@@ -43,10 +54,12 @@ class ScrollHandler implements Debugger
     @_remaining ||= @element-bottom - @container-bottom
 
   config-window-scroll: ->
+    info-msg "config-window-scroll"
     @container-bottom = @container.height! + @container.scroll-top!
     @element-bottom   = @elem.offset!top + @elem.height!
 
   config-container-scroll: ->
+    info-msg "config-container-scroll"
     container-bottom  = @container.height!
     element-bottom    = @elem.offset!top - @container.offset!top + @elem.height!
 

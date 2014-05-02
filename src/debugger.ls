@@ -10,8 +10,10 @@ module.exports =
       console.log constr + ':'
       console.log ...
 
+  debug-lv: 0
+
   info-msg: ->
-    if @debugging || @@debug-all
+    if @has-debug! and @debug-lv > 0
       console.log ...
 
   debug-all-on: ->

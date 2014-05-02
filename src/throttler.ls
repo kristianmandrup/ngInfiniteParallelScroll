@@ -21,10 +21,12 @@ class Throttler implements Debugger
   remaining-time: ->
     @remaining ||= wait - (@now! - @previous)
 
-  setTimeout: ->
+  set-timeout: ->
+    debug "set timeout"
     @timeout ||= $timeout(later, remaining)
 
   reset: ->
+    debug "reset"
     @clearTimeout @timeout
     @$timeout.cancel @timeout
     @timeout = null
@@ -38,6 +40,7 @@ class Throttler implements Debugger
   previous: 0
 
   later: ->
+    debug "later"
     @previous = new Date().get-time!
     @$timeout.cancel timeout
     @timeout = null

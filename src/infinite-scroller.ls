@@ -60,26 +60,32 @@ mod.directive 'infiniteScroller', ['$rootScope', '$window', '$timeout', 'THROTTL
   wrap-angular: (element) ->
     angular.element element
 
-  scroll-handler: (debug)->
-    @_scroll-handler ||= new ScrollHandler(debug).handle-scroll
+  throttler: (debug) ->
+    @_throttler ||= new Throttler($timeout, debug)
 
-  throttler: ->
-    @_throttler ||= new Throttler($timeout)
+  basic-scroll-handler: (debug)->
+    new ScrollHandler(debug).handle-scroll
 
   throttled-scroll-handler: (wait-ms, debug)->
-    @_scroll-handler = @throttler!.config @scroll-handler(debug), wait-ms
+    @throttler(debug).config @scroll-handler(debug), wait-ms if wait-ms?
+
+  create-scroll-handler: (wait, debug)->
+    @scroll-handler = @throttled-scroll-handler(wait, debug) or @basic-handler(debug)
 
   link: (scope, elem, attrs) ->
     debug-msg "infiniteScroller: link ", attrs
     $window   = @wrap-angular $window
 
     @debug-on = attrs.debug-on
+    @debug-lv = attrs.debug-lv or 0
 
     wait-ms = THROTTLE_MILLISECONDS
     debug-msg "wait ", wait-ms
 
+    @create-scroll-handler wait-ms, @debug-lv
+
     scope.$on '$destroy', ->
-      @config.container.off 'scroll', @throttled-scroll-handler(wait-ms, @debug-on) if wait-ms?
+      @config.container.off 'scroll', @scroll-handler
 
     debug-msg "infiniteScrollDistance", @handle-infinite-scroll-distance
 
